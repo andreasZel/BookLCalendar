@@ -11,7 +11,7 @@
 - "Suggest" uses a stub `SuggestionService`, real AI later (#6)
 - CLAUDE.md JSX rules applied in spirit: inline params, one composable per file, local types at file end
 - Issues live on GitHub, one per task, branch `feat/<issue>-<slug>`
-- Branches #2 → #5 are stacked, each starts from the previous one, merge in order
+- Branches #2 → #7 are stacked, each starts from the previous one, merge in order
 - Commits get `[n]` from the `prepare-commit-msg` hook (`core.hooksPath = .githooks`)
 
 ## Progress
@@ -52,18 +52,21 @@ Branch `feat/5-book-detail`
 - [x] Back to shelf
 - [ ] Visual check on a device or emulator (headless emulator failed to boot)
 
-### #6 Real AI suggestions — todo
+### #7 Shelf search — done
+Branch `feat/7-shelf-search` (cut from `feat/5-book-detail`)
+- [x] Search by title and description (case and accent insensitive, every word must match)
+- [x] Results keep the comic card look and date grouping
+- [x] Search button in header, close button and system back clear the search
+- [x] Unit tests for filtering
+- [ ] Visual check on a device or emulator
+
+### #6 Real AI suggestions — todo, last feature
 Branch `feat/6-ai-suggestions`
 - [ ] Cover photo → title + description (vision)
 - [ ] Title → short description
 - [ ] Keep the API key off the device (backend or proxy)
 
-### #7 Shelf search — todo
-Branch `feat/7-shelf-search`
-- [ ] Search by title and description
-- [ ] Results keep the comic card look
-
 ## Next
 
-- Push branches #1–#5 and open PRs (stacked: #3 on #2, #4 on #3, #5 on #4)
-- Start #6 or #7
+- Push branches #1–#5 and #7, open PRs (stacked: #3 on #2, #4 on #3, #5 on #4, #7 on #5)
+- #6 is the last feature, implement it after everything else
