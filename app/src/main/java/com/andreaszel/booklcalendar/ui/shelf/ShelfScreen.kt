@@ -1,5 +1,6 @@
 package com.andreaszel.booklcalendar.ui.shelf
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -34,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.ComicButton
 import com.andreaszel.booklcalendar.ui.components.ComicIcon
+import com.andreaszel.booklcalendar.ui.components.ComicIconButton
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
 import com.andreaszel.booklcalendar.ui.theme.Dimens
 import com.andreaszel.booklcalendar.ui.theme.Palette
@@ -47,6 +49,9 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit) {
     val vm = appViewModel { ShelfViewModel(it.books) }
     val state by vm.state.collectAsStateWithLifecycle()
     val today = remember { LocalDate.now() }
+    val filtering = state.query.isNotBlank()
+
+    BackHandler(enabled = state.searching) { vm.closeSearch() }
 
     Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -54,10 +59,17 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.size(Dimens.Touch).comic(Palette.Yellow, shadow = 2.dp)) {
                     ComicIcon(ComicIcons.Book, size = 24.dp)
                 }
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text("My Bookshelf", style = TextStyles.Heading.copy(fontSize = 26.sp, lineHeight = 29.sp), modifier = Modifier.semantics { heading() })
-                    Text(if (state.books.size == 1) "1 book logged" else "${state.books.size} books logged", style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted))
+                    Text(if (filtering) "${state.matches.size} of ${countLabel(state.books.size)}" else if (state.books.size == 1) "1 book logged" else "${state.books.size} books logged", style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted))
                 }
+                if (!state.searching && state.books.isNotEmpty()) {
+                    ComicIconButton(icon = ComicIcons.Search, label = "Search shelf", fill = Palette.Sky, onClick = vm::openSearch)
+                }
+            }
+
+            if (state.searching) {
+                ShelfSearchBar(query = state.query, onChange = vm::setQuery, onClose = vm::closeSearch)
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)) {
@@ -76,9 +88,17 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit) {
                 }
             }
 
+            if (filtering && state.books.isNotEmpty() && state.matches.isEmpty()) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(16.dp).fillMaxWidth().dashedComic(Palette.White).padding(horizontal = 20.dp, vertical = 24.dp)) {
+                    ComicIcon(ComicIcons.Search, size = 40.dp)
+                    Text("No books match \"${state.query.trim()}\"", textAlign = TextAlign.Center, style = TextStyles.Label.copy(fontSize = 18.sp))
+                    Text("Try another word from a title or description.", textAlign = TextAlign.Center, style = TextStyles.Body.copy(fontSize = 14.sp, color = Palette.Muted))
+                }
+            }
+
             AnimatedContent(targetState = state.level, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "zoom", modifier = Modifier.weight(1f).pinchSteps(onZoomIn = vm::zoomIn, onZoomOut = vm::zoomOut)) { level ->
                 val look = looks.getValue(level)
-                val groups = remember(state.books, level) { groupBooks(state.books, level, today) }
+                val groups = remember(state.matches, level) { groupBooks(state.matches, level, today) }
                 LazyVerticalGrid(columns = GridCells.Fixed(level.columns), horizontalArrangement = Arrangement.spacedBy(look.gap.dp), verticalArrangement = Arrangement.spacedBy(look.gap.dp), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 120.dp), modifier = Modifier.fillMaxSize()) {
                     groups.forEach { group ->
                         item(key = "group-${group.key}", span = { GridItemSpan(maxLineSpan) }) {

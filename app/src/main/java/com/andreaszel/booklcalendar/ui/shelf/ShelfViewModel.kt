@@ -12,9 +12,10 @@ import kotlinx.coroutines.flow.stateIn
 
 class ShelfViewModel(repository: BookRepository) : ViewModel() {
     private val level = MutableStateFlow(ZoomLevel.Weeks)
+    private val search = MutableStateFlow(Search())
 
-    val state: StateFlow<ShelfUiState> = combine(repository.observeAll(), level) { books, zoom ->
-        ShelfUiState(loaded = true, level = zoom, books = books)
+    val state: StateFlow<ShelfUiState> = combine(repository.observeAll(), level, search) { books, zoom, find ->
+        ShelfUiState(loaded = true, level = zoom, books = books, searching = find.open, query = find.query, matches = filterBooks(books, find.query))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShelfUiState())
 
     fun setLevel(next: ZoomLevel) {
@@ -24,6 +25,20 @@ class ShelfViewModel(repository: BookRepository) : ViewModel() {
     fun zoomIn() = setLevel(level.value.zoomIn())
 
     fun zoomOut() = setLevel(level.value.zoomOut())
+
+    fun openSearch() {
+        search.value = search.value.copy(open = true)
+    }
+
+    fun setQuery(query: String) {
+        search.value = search.value.copy(query = query)
+    }
+
+    fun closeSearch() {
+        search.value = Search()
+    }
+
+    private data class Search(val open: Boolean = false, val query: String = "")
 }
 
-data class ShelfUiState(val loaded: Boolean = false, val level: ZoomLevel = ZoomLevel.Weeks, val books: List<Book> = emptyList())
+data class ShelfUiState(val loaded: Boolean = false, val level: ZoomLevel = ZoomLevel.Weeks, val books: List<Book> = emptyList(), val searching: Boolean = false, val query: String = "", val matches: List<Book> = emptyList())
