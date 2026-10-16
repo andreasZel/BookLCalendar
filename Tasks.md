@@ -8,10 +8,13 @@
   - ink `#2B2140`, 3dp outlines, solid offset shadows (no blur), radius 6dp
   - background `#F1ECFF`, coral `#FF8A65`, yellow `#FFC94A`, sky `#7DD3E8`, lilac `#B9A6FF`
   - Fredoka (headings) + Nunito (body), bundled in `res/font`
-- "Suggest" uses a stub `SuggestionService`, real AI later (#6)
+- Book info comes from free APIs, no AI and no backend (#6)
+  - Google Books (title, author, description, ISBN), Open Library (covers, fallback), Wikipedia (summary fallback)
+  - ISBN barcode via Google code scanner, cover text via ML Kit OCR, both on-device and free
+  - API keys are entered in the app's Settings screen, never in the source or APK, and excluded from backups
 - CLAUDE.md JSX rules applied in spirit: inline params, one composable per file, local types at file end
 - Issues live on GitHub, one per task, branch `feat/<issue>-<slug>`
-- Branches #2 → #7 are stacked, each starts from the previous one, merge in order
+- Branches #2 → #7 → #6 are stacked, each starts from the previous one, merge in order
 - Commits get `[n]` from the `prepare-commit-msg` hook (`core.hooksPath = .githooks`)
 
 ## Progress
@@ -60,13 +63,23 @@ Branch `feat/7-shelf-search` (cut from `feat/5-book-detail`)
 - [x] Unit tests for filtering
 - [ ] Visual check on a device or emulator
 
-### #6 Real AI suggestions — todo, last feature
-Branch `feat/6-ai-suggestions`
-- [ ] Cover photo → title + description (vision)
-- [ ] Title → short description
-- [ ] Keep the API key off the device (backend or proxy)
+### #6 Online book lookup — done
+Branch `feat/6-book-lookup` (cut from `feat/7-shelf-search`, replaces the stub "Suggest")
+- [x] Data: `author`, `isbn`, `Online` cover source, Room auto-migration 1 → 2
+- [x] Lookup: Google Books → Open Library fallback, description from Open Library work or Wikipedia
+- [x] Description cleanup (HTML, entities, length cut at a sentence)
+- [x] Scan ISBN barcode → exact lookup
+- [x] Typed title → top matches to pick from, best one applied, Undo
+- [x] Cover photo → OCR → search
+- [x] Online cover downloaded when the book has no photo
+- [x] Author field in the form, author on details, search includes author
+- [x] Settings screen: optional Google Books API key, test and remove, kept out of backups
+- [x] Friendly errors when offline or nothing found
+- [x] Unit tests for parsing and text helpers
+- [x] README with setup steps
+- [ ] Visual check on a device or emulator
 
 ## Next
 
-- Push branches #1–#5 and #7, open PRs (stacked: #3 on #2, #4 on #3, #5 on #4, #7 on #5)
-- #6 is the last feature, implement it after everything else
+- Visual check of #5, #7 and #6 on a device with Google Play services
+- Push branches #1–#7, open PRs (stacked: #3 on #2, #4 on #3, #5 on #4, #7 on #5, #6 on #7)

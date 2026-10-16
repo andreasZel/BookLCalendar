@@ -3,22 +3,21 @@ package com.andreaszel.booklcalendar.ui.add
 import com.andreaszel.booklcalendar.ui.DateLabels
 import java.time.LocalDate
 
-fun suggestCopy(hasPhoto: Boolean, hasTitle: Boolean, suggested: Boolean, busy: Boolean): SuggestCopy {
-    val enabled = (hasPhoto || hasTitle) && !busy
+fun lookupCopy(hasPhoto: Boolean, hasQuery: Boolean, found: Boolean, busy: Boolean): LookupCopy {
+    val enabled = (hasPhoto || hasQuery) && !busy
     val label = when {
-        busy -> "Thinking…"
-        suggested -> "Suggest another"
-        hasPhoto && !hasTitle -> "Suggest title & description"
-        hasTitle -> "Suggest description"
-        else -> "Suggest"
+        busy -> "Looking up…"
+        hasQuery -> "Find by title"
+        hasPhoto -> "Read the cover"
+        else -> "Find online"
     }
     val hint = when {
-        suggested -> "Filled in by suggestion — tap again for another, or Undo."
-        hasPhoto && !hasTitle -> "Reads your cover photo and fills both fields. You can edit anything."
-        hasTitle -> "Writes a short description from the title. You can edit it."
-        else -> "Add a photo or type a title, and I can fill in the rest."
+        found -> "Filled in from online book info. Not it? Pick another match, or Undo."
+        hasQuery -> "Looks the title up in free book databases and fills in the rest."
+        hasPhoto -> "Reads the text on your cover photo and looks the book up."
+        else -> "Scan the barcode, add a cover photo or type a title, and I can fill in the rest."
     }
-    return SuggestCopy(label, hint, enabled)
+    return LookupCopy(label, hint, enabled)
 }
 
 fun shelfHint(date: LocalDate, today: LocalDate): String {
@@ -29,4 +28,4 @@ fun shelfHint(date: LocalDate, today: LocalDate): String {
     return "the week of ${monday.dayOfMonth} ${DateLabels.month(monday)} – ${sunday.dayOfMonth} ${DateLabels.month(sunday)} ${sunday.year}"
 }
 
-data class SuggestCopy(val label: String, val hint: String, val enabled: Boolean)
+data class LookupCopy(val label: String, val hint: String, val enabled: Boolean)

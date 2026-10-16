@@ -21,6 +21,8 @@ object ComicIcons {
     val Calendar by lazy { icon(2.4f, Line("M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"), Line("M3 10h18M8 3v4M16 3v4")) }
     val Check by lazy { icon(3.2f, Line("M5 12l5 5L20 7")) }
     val Sparkle by lazy { icon(2.2f, Line("M12 2l2.2 6.3L20.5 10.5l-6.3 2.2L12 19l-2.2-6.3L3.5 10.5l6.3-2.2z", Palette.White), Line("M19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z", Palette.White)) }
+    val Barcode by lazy { icon(2.4f, Line("M4 6v12M7.5 6v12M10 6v12M14 6v12M17 6v12M20 6v12")) }
+    val Key by lazy { icon(2.4f, Line(circle(8f, 16f, 4.5f)), Line("M11.2 12.8L20 4M16.5 7.5l3 3M14 10l2 2")) }
     val Search by lazy { icon(2.6f, Line(circle(10.5f, 10.5f, 6.5f)), Line("M15.5 15.5L21 21")) }
     val Pinch by lazy { icon(2.2f, Line("M4 4l5 5"), Line("M4 9V4h5"), Line("M20 20l-5-5"), Line("M20 15v5h-5")) }
 

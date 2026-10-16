@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.andreaszel.booklcalendar.ui.add.AddBookScreen
 import com.andreaszel.booklcalendar.ui.detail.BookDetailScreen
+import com.andreaszel.booklcalendar.ui.settings.SettingsScreen
 import com.andreaszel.booklcalendar.ui.shelf.ShelfScreen
 import com.andreaszel.booklcalendar.ui.theme.Palette
 
@@ -19,13 +20,16 @@ fun AppNavHost() {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.SHELF, modifier = Modifier.fillMaxSize().background(Palette.Paper)) {
         composable(Routes.SHELF) {
-            ShelfScreen(onAdd = { nav.navigate(Routes.edit()) }, onOpen = { nav.navigate(Routes.detail(it)) })
+            ShelfScreen(onAdd = { nav.navigate(Routes.edit()) }, onOpen = { nav.navigate(Routes.detail(it)) }, onSettings = { nav.navigate(Routes.SETTINGS) })
         }
         composable(Routes.DETAIL, arguments = listOf(navArgument("id") { type = NavType.LongType })) { entry ->
             BookDetailScreen(bookId = entry.arguments?.getLong("id") ?: 0L, onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.edit(it)) })
         }
         composable(Routes.EDIT, arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = 0L })) { entry ->
             AddBookScreen(bookId = entry.arguments?.getLong("id") ?: 0L, onDone = { nav.popBackStack() })
+        }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(onBack = { nav.popBackStack() })
         }
     }
 }
@@ -34,6 +38,7 @@ object Routes {
     const val SHELF = "shelf"
     const val DETAIL = "book/{id}"
     const val EDIT = "edit?id={id}"
+    const val SETTINGS = "settings"
 
     fun detail(id: Long) = "book/$id"
     fun edit(id: Long = 0L) = "edit?id=$id"

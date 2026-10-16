@@ -24,11 +24,11 @@ import com.andreaszel.booklcalendar.ui.theme.comic
 import com.andreaszel.booklcalendar.ui.theme.focusRing
 
 @Composable
-fun ComicTextField(value: String, onChange: (String) -> Unit, placeholder: String, fontSize: TextUnit, modifier: Modifier = Modifier, isError: Boolean = false, singleLine: Boolean = true, minLines: Int = 1) {
+fun ComicTextField(value: String, onChange: (String) -> Unit, placeholder: String, fontSize: TextUnit, modifier: Modifier = Modifier, isError: Boolean = false, singleLine: Boolean = true, minLines: Int = 1, capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences) {
     val source = remember { MutableInteractionSource() }
     val focused by source.collectIsFocusedAsState()
     val style = (if (singleLine) TextStyles.Body else TextStyles.Body.copy(lineHeight = fontSize * 1.4f)).copy(fontSize = fontSize)
-    BasicTextField(value = value, onValueChange = onChange, singleLine = singleLine, minLines = minLines, textStyle = style, cursorBrush = SolidColor(Palette.Ink), interactionSource = source, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences), modifier = modifier.fillMaxWidth().focusRing(focused).comic(Palette.White, edge = if (isError) Palette.Error else Palette.Ink), decorationBox = { inner ->
+    BasicTextField(value = value, onValueChange = onChange, singleLine = singleLine, minLines = minLines, textStyle = style, cursorBrush = SolidColor(Palette.Ink), interactionSource = source, keyboardOptions = KeyboardOptions(capitalization = capitalization, autoCorrectEnabled = capitalization != KeyboardCapitalization.None), modifier = modifier.fillMaxWidth().focusRing(focused).comic(Palette.White, edge = if (isError) Palette.Error else Palette.Ink), decorationBox = { inner ->
         Box(contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart, modifier = Modifier.heightIn(min = 52.dp).padding(horizontal = 14.dp, vertical = 12.dp)) {
             if (value.isEmpty()) Text(placeholder, style = style.copy(color = Palette.Muted.copy(alpha = 0.7f)))
             inner()
