@@ -21,16 +21,16 @@ Branch `feat/scaffold-theme`
 - [x] Room database, Book entity, repository
 - [x] Navigation shell (shelf, add/edit, detail)
 
-### 2. Shelf grid — in progress
+### 2. Shelf grid — done
 Branch `feat/shelf-grid`
-- [ ] Grouping by day / week / year with separators + counts
-- [ ] 2 / 3 / 5 column density, titles hidden in Years
-- [ ] Days/Weeks/Years segmented control + pinch zoom
-- [ ] Cover cards with dotted initial placeholder
-- [ ] Extended "Add book" FAB, card opens details
-- [ ] Unit tests for grouping
+- [x] Grouping by day / week / year with separators + counts
+- [x] 2 / 3 / 5 column density, titles hidden in Years
+- [x] Days/Weeks/Years segmented control + pinch zoom
+- [x] Cover cards with dotted initial placeholder
+- [x] Extended "Add book" FAB, card opens details
+- [x] Unit tests for grouping
 
-### 3. Add a book — todo
+### 3. Add a book — in progress
 Branch `feat/add-book`
 - [ ] Cover from Camera or Gallery (optional), change photo
 - [ ] Title required, red border + message on blocked save
