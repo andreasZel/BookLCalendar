@@ -30,15 +30,15 @@ Branch `feat/shelf-grid`
 - [x] Extended "Add book" FAB, card opens details
 - [x] Unit tests for grouping
 
-### 3. Add a book — in progress
+### 3. Add a book — done
 Branch `feat/add-book`
-- [ ] Cover from Camera or Gallery (optional), change photo
-- [ ] Title required, red border + message on blocked save
-- [ ] Suggest (photo → title + description, title → description, disabled hint), re-suggest, Undo
-- [ ] Today / Yesterday chips + date picker + shelf group hint
-- [ ] "Add to shelf" saves, reused for editing
+- [x] Cover from Camera or Gallery (optional), change photo
+- [x] Title required, red border + message on blocked save
+- [x] Suggest (photo → title + description, title → description, disabled hint), re-suggest, Undo
+- [x] Today / Yesterday chips + date picker + shelf group hint
+- [x] "Add to shelf" saves, reused for editing
 
-### 4. Book details — todo
+### 4. Book details — in progress
 Branch `feat/book-detail`
 - [ ] Tilted cover, title, read-date chip, photo-source chip, description card
 - [ ] Edit opens the form, Delete asks for confirmation
