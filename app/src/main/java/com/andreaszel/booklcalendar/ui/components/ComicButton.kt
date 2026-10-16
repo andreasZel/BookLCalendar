@@ -20,8 +20,8 @@ import com.andreaszel.booklcalendar.ui.theme.Dimens
 import com.andreaszel.booklcalendar.ui.theme.TextStyles
 
 @Composable
-fun ComicButton(text: String, onClick: () -> Unit, fill: Color, modifier: Modifier = Modifier, icon: ImageVector? = null, height: Dp = 52.dp, radius: Dp = Dimens.Radius, shadow: Dp = 3.dp, fontSize: TextUnit = 16.sp, padding: PaddingValues = PaddingValues(horizontal = 16.dp)) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically, modifier = modifier.heightIn(min = height).pressable(fill = fill, shadow = shadow, radius = radius, role = Role.Button, onClick = onClick).padding(padding)) {
+fun ComicButton(text: String, onClick: () -> Unit, fill: Color, modifier: Modifier = Modifier, icon: ImageVector? = null, height: Dp = 52.dp, radius: Dp = Dimens.Radius, shadow: Dp = 3.dp, fontSize: TextUnit = 16.sp, padding: PaddingValues = PaddingValues(horizontal = 16.dp), enabled: Boolean = true) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically, modifier = modifier.heightIn(min = height).pressable(fill = fill, shadow = shadow, radius = radius, enabled = enabled, role = Role.Button, onClick = onClick).padding(padding)) {
         if (icon != null) ComicIcon(icon, size = 22.dp)
         Text(text, style = TextStyles.Label.copy(fontSize = fontSize))
     }
