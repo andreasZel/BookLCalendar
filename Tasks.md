@@ -12,7 +12,7 @@
 - CLAUDE.md JSX rules applied in spirit: inline params, one composable per file, local types at file end
 - Issues live on GitHub, one per task, branch `feat/<issue>-<slug>`
 - Branches #2 → #5 are stacked, each starts from the previous one, merge in order
-- Commits made before the issues existed have no `[n]` prefix, their branch name carries the issue
+- Commits get `[n]` from the `prepare-commit-msg` hook (`core.hooksPath = .githooks`)
 
 ## Progress
 
