@@ -81,11 +81,16 @@ fun BookDetailScreen(bookId: Long, onBack: () -> Unit, onEdit: (Long) -> Unit) {
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = sheetMin).bleed().background(Palette.White, RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).border(Dimens.Outline, Palette.Ink, RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).navigationBarsPadding().padding(start = 23.dp, end = 23.dp, top = 22.dp, bottom = 32.dp)) {
-                    Text(book.title, style = TextStyles.Heading.copy(fontSize = 32.sp, lineHeight = 35.sp), modifier = Modifier.semantics { heading() })
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(book.title, style = TextStyles.Heading.copy(fontSize = 32.sp, lineHeight = 35.sp), modifier = Modifier.semantics { heading() })
+                        if (book.author.isNotBlank()) {
+                            Text("by ${book.author}", style = TextStyles.Strong.copy(fontSize = 16.sp, color = Palette.MutedDeep))
+                        }
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         InfoPill(text = "Read ${DateLabels.full(book.readDate)}", icon = ComicIcons.Calendar, fill = Palette.Sky, fontSize = 13.sp, iconSize = 16.dp, vertical = 6.dp, horizontal = 12.dp)
                         if (book.coverSource != null) {
-                            InfoPill(text = if (book.coverSource == CoverSource.Camera) "Photo from camera" else "Photo from gallery", icon = if (book.coverSource == CoverSource.Camera) ComicIcons.Camera else ComicIcons.Gallery, fill = Palette.Paper, fontSize = 13.sp, iconSize = 16.dp, vertical = 6.dp, horizontal = 12.dp)
+                            InfoPill(text = when (book.coverSource) { CoverSource.Camera -> "Photo from camera"; CoverSource.Online -> "Cover found online"; else -> "Photo from gallery" }, icon = when (book.coverSource) { CoverSource.Camera -> ComicIcons.Camera; CoverSource.Online -> ComicIcons.Book; else -> ComicIcons.Gallery }, fill = Palette.Paper, fontSize = 13.sp, iconSize = 16.dp, vertical = 6.dp, horizontal = 12.dp)
                         }
                     }
                     Column(modifier = Modifier.fillMaxWidth().comic(Palette.Cream, shadow = 0.dp).padding(14.dp)) {

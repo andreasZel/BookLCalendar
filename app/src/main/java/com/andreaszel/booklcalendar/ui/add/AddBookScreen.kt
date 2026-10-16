@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,11 +50,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andreaszel.booklcalendar.data.CoverSource
+import com.andreaszel.booklcalendar.lookup.IsbnScanner
 import com.andreaszel.booklcalendar.ui.DateLabels
 import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.BookCover
@@ -73,17 +76,33 @@ import com.andreaszel.booklcalendar.ui.theme.topRule
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
-    val vm = appViewModel(key = "edit-$bookId") { AddBookViewModel(bookId, it.books, it.covers, it.suggestions) }
+    val vm = appViewModel(key = "edit-$bookId") { AddBookViewModel(bookId, it.books, it.covers, it.lookup, it.coverReader) }
     val state by vm.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val today = remember { LocalDate.now() }
     var cameraUri by rememberSaveable { mutableStateOf<String?>(null) }
     var picking by rememberSaveable { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val close = { vm.discard(); onDone() }
+    val scan: () -> Unit = {
+        scope.launch {
+            val raw = try {
+                IsbnScanner.scan(context)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Toast.makeText(context, "The scanner is getting ready. Try again in a moment.", Toast.LENGTH_SHORT).show()
+                null
+            }
+            if (raw != null) vm.lookupIsbn(raw)
+        }
+    }
 
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
         val uri = cameraUri
@@ -97,7 +116,7 @@ fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
     BackHandler { close() }
 
     val hasTitle = state.title.isNotBlank()
-    val copy = suggestCopy(hasPhoto = state.coverPath != null, hasTitle = hasTitle, suggested = state.undo != null, busy = state.busy)
+    val copy = lookupCopy(hasPhoto = state.coverPath != null, hasQuery = hasTitle || state.author.isNotBlank(), found = state.undo != null, busy = state.busy)
     val showError = state.attempted && !hasTitle
 
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
@@ -133,20 +152,34 @@ fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
                         BookCover(title = state.title, coverPath = state.coverPath, initialSize = 40.sp)
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 4.dp)) {
-                        InfoPill(text = if (state.coverSource == CoverSource.Camera) "Taken with camera" else "Picked from gallery", icon = ComicIcons.Check, fill = Palette.White, fontSize = 12.sp, iconSize = 14.dp, vertical = 4.dp, horizontal = 10.dp)
+                        InfoPill(text = when (state.coverSource) { CoverSource.Camera -> "Taken with camera"; CoverSource.Online -> "Found online"; else -> "Picked from gallery" }, icon = ComicIcons.Check, fill = Palette.White, fontSize = 12.sp, iconSize = 14.dp, vertical = 4.dp, horizontal = 10.dp)
                         ComicButton(text = "Change photo", onClick = vm::clearCover, fill = Palette.White, height = Dimens.Touch, shadow = 2.dp, fontSize = 15.sp)
                     }
                 }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().comic(Palette.Cream, radius = Dimens.RadiusBig, shadow = 0.dp).padding(14.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    ComicButton(text = copy.label, onClick = vm::suggest, enabled = copy.enabled, icon = ComicIcons.Sparkle, fill = if (copy.enabled || state.busy) Palette.Lilac else Palette.DisabledLight, height = 46.dp, radius = 23.dp, modifier = Modifier.alpha(if (copy.enabled || state.busy) 1f else 0.6f))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(end = 2.dp, bottom = 2.dp)) {
+                    ComicButton(text = copy.label, onClick = vm::findOnline, enabled = copy.enabled, icon = ComicIcons.Sparkle, fill = if (copy.enabled || state.busy) Palette.Lilac else Palette.DisabledLight, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).alpha(if (copy.enabled || state.busy) 1f else 0.6f))
+                    ComicButton(text = "Scan ISBN", onClick = scan, enabled = !state.busy, icon = ComicIcons.Barcode, fill = Palette.Sky, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 12.dp))
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(copy.hint, style = TextStyles.Body.copy(fontSize = 13.sp, color = Palette.MutedDeep), modifier = Modifier.weight(1f))
                     if (state.undo != null) {
                         Text("Undo", style = TextStyles.Strong.copy(fontSize = 14.sp, textDecoration = TextDecoration.Underline), modifier = Modifier.heightIn(min = Dimens.Touch).clip(RoundedCornerShape(Dimens.Radius)).clickable(role = Role.Button, onClick = vm::undo).padding(horizontal = 10.dp, vertical = 12.dp))
                     }
                 }
-                Text(copy.hint, style = TextStyles.Body.copy(fontSize = 13.sp, color = Palette.MutedDeep))
+                if (state.notice != null) {
+                    Text(state.notice.orEmpty(), style = TextStyles.Strong.copy(fontSize = 13.sp), modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+                }
+                if (state.matches.size > 1) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                        Text("Matches, tap to switch", style = TextStyles.Label.copy(fontSize = 14.sp))
+                        state.matches.forEachIndexed { index, match ->
+                            MatchRow(match = match, picked = index == state.picked, onClick = { vm.pick(index) })
+                        }
+                    }
+                }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -159,6 +192,14 @@ fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
                 if (showError) {
                     Text("Every book needs a title before it goes on the shelf.", style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Error), modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive })
                 }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Author", style = TextStyles.Label.copy(fontSize = 16.sp))
+                    Text("optional", style = TextStyles.Strong.copy(fontSize = 12.sp, color = Palette.Muted), modifier = Modifier.padding(bottom = 2.dp))
+                }
+                ComicTextField(value = state.author, onChange = vm::onAuthor, placeholder = "e.g. Antoine de Saint-Exupéry", fontSize = 16.sp, capitalization = KeyboardCapitalization.Words)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

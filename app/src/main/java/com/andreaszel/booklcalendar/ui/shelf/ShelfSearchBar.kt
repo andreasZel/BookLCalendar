@@ -22,7 +22,7 @@ fun ShelfSearchBar(query: String, onChange: (String) -> Unit, onClose: () -> Uni
     LaunchedEffect(Unit) { focus.requestFocus() }
 
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)) {
-        ComicTextField(value = query, onChange = onChange, placeholder = "Search titles and descriptions", fontSize = 16.sp, modifier = Modifier.weight(1f).focusRequester(focus))
+        ComicTextField(value = query, onChange = onChange, placeholder = "Search title, author or description", fontSize = 16.sp, modifier = Modifier.weight(1f).focusRequester(focus))
         ComicIconButton(icon = ComicIcons.Close, label = "Close search", onClick = onClose)
     }
 }

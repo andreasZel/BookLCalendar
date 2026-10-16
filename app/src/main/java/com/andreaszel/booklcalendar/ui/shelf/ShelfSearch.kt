@@ -8,7 +8,7 @@ fun filterBooks(books: List<Book>, query: String): List<Book> {
     val terms = fold(query).split(Regex("\\s+")).filter { it.isNotEmpty() }
     if (terms.isEmpty()) return books
     return books.filter { book ->
-        val text = fold("${book.title} ${book.description}")
+        val text = fold("${book.title} ${book.author} ${book.description}")
         terms.all { text.contains(it) }
     }
 }

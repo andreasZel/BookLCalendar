@@ -11,7 +11,7 @@ class ShelfSearchTest {
         book(1, "Piranesi", "A man lives in an endless house of statues and tides."),
         book(2, "The Little Prince", "A pilot meets a boy from a tiny planet."),
         book(3, "Project Hail Mary", "A lone astronaut wakes up far from Earth."),
-        book(4, "Les Misérables", "Jean Valjean and the barricades of Paris."),
+        book(4, "Les Misérables", "Jean Valjean and the barricades of Paris.", "Victor Hugo"),
     )
 
     @Test
@@ -36,6 +36,11 @@ class ShelfSearchTest {
     }
 
     @Test
+    fun matchesAuthor() {
+        assertEquals(listOf(4L), ids("hugo"))
+    }
+
+    @Test
     fun ignoresAccents() {
         assertEquals(listOf(4L), ids("miserables"))
         assertEquals(listOf(4L), ids("Misérables"))
@@ -43,5 +48,5 @@ class ShelfSearchTest {
 
     private fun ids(query: String) = filterBooks(books, query).map { it.id }
 
-    private fun book(id: Long, title: String, description: String) = Book(id = id, title = title, description = description, readDate = LocalDate.of(2026, 10, 16), coverPath = null, coverSource = null)
+    private fun book(id: Long, title: String, description: String, author: String = "") = Book(id = id, title = title, author = author, description = description, readDate = LocalDate.of(2026, 10, 16), coverPath = null, coverSource = null)
 }

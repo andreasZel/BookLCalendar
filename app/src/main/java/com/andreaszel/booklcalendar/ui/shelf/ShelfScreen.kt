@@ -45,7 +45,7 @@ import com.andreaszel.booklcalendar.ui.theme.dashedComic
 import java.time.LocalDate
 
 @Composable
-fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit) {
+fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Unit) {
     val vm = appViewModel { ShelfViewModel(it.books) }
     val state by vm.state.collectAsStateWithLifecycle()
     val today = remember { LocalDate.now() }
@@ -66,6 +66,7 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit) {
                 if (!state.searching && state.books.isNotEmpty()) {
                     ComicIconButton(icon = ComicIcons.Search, label = "Search shelf", fill = Palette.Sky, onClick = vm::openSearch)
                 }
+                ComicIconButton(icon = ComicIcons.Key, label = "Settings", onClick = onSettings)
             }
 
             if (state.searching) {

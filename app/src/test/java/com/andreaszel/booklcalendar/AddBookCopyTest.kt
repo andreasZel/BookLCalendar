@@ -1,7 +1,7 @@
 package com.andreaszel.booklcalendar
 
+import com.andreaszel.booklcalendar.ui.add.lookupCopy
 import com.andreaszel.booklcalendar.ui.add.shelfHint
-import com.andreaszel.booklcalendar.ui.add.suggestCopy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -12,34 +12,34 @@ class AddBookCopyTest {
     private val today = LocalDate.of(2026, 10, 16)
 
     @Test
-    fun suggestDisabledWithoutPhotoOrTitle() {
-        val copy = suggestCopy(hasPhoto = false, hasTitle = false, suggested = false, busy = false)
+    fun lookupDisabledWithoutPhotoOrTitle() {
+        val copy = lookupCopy(hasPhoto = false, hasQuery = false, found = false, busy = false)
         assertFalse(copy.enabled)
-        assertEquals("Add a photo or type a title, and I can fill in the rest.", copy.hint)
+        assertEquals("Scan the barcode, add a cover photo or type a title, and I can fill in the rest.", copy.hint)
     }
 
     @Test
-    fun suggestFromPhotoFillsBoth() {
-        val copy = suggestCopy(hasPhoto = true, hasTitle = false, suggested = false, busy = false)
+    fun lookupFromPhotoReadsCover() {
+        val copy = lookupCopy(hasPhoto = true, hasQuery = false, found = false, busy = false)
         assertTrue(copy.enabled)
-        assertEquals("Suggest title & description", copy.label)
+        assertEquals("Read the cover", copy.label)
     }
 
     @Test
-    fun suggestFromTitleWritesDescription() {
-        assertEquals("Suggest description", suggestCopy(hasPhoto = false, hasTitle = true, suggested = false, busy = false).label)
+    fun typedTitleWinsOverPhoto() {
+        assertEquals("Find by title", lookupCopy(hasPhoto = true, hasQuery = true, found = false, busy = false).label)
     }
 
     @Test
-    fun afterSuggestionOffersAnother() {
-        val copy = suggestCopy(hasPhoto = true, hasTitle = true, suggested = true, busy = false)
-        assertEquals("Suggest another", copy.label)
-        assertEquals("Filled in by suggestion — tap again for another, or Undo.", copy.hint)
+    fun afterLookupOffersOtherMatches() {
+        assertEquals("Filled in from online book info. Not it? Pick another match, or Undo.", lookupCopy(hasPhoto = false, hasQuery = true, found = true, busy = false).hint)
     }
 
     @Test
-    fun busyDisablesSuggest() {
-        assertFalse(suggestCopy(hasPhoto = true, hasTitle = true, suggested = false, busy = true).enabled)
+    fun busyDisablesLookup() {
+        val copy = lookupCopy(hasPhoto = true, hasQuery = true, found = false, busy = true)
+        assertFalse(copy.enabled)
+        assertEquals("Looking up…", copy.label)
     }
 
     @Test
