@@ -1,0 +1,23 @@
+#!/bin/sh
+# Prefixes commit messages with [issue] taken from feat/<n> or fix/<n> branches.
+
+MSG_FILE="$1"
+SOURCE="$2"
+
+case "$SOURCE" in
+    merge|squash) exit 0 ;;
+esac
+
+BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null) || exit 0
+NUMBER=$(printf '%s' "$BRANCH" | sed -n -E 's#^(feat|fix)/([0-9]+).*#\2#p')
+
+[ -z "$NUMBER" ] && exit 0
+
+if head -n 1 "$MSG_FILE" | grep -q -E '^\[[0-9]+\]'; then
+    exit 0
+fi
+
+TMP_FILE="$MSG_FILE.tmp"
+printf '[%s] ' "$NUMBER" > "$TMP_FILE"
+cat "$MSG_FILE" >> "$TMP_FILE"
+mv "$TMP_FILE" "$MSG_FILE"
