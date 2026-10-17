@@ -4,17 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andreaszel.booklcalendar.lookup.GoogleBooks
 import com.andreaszel.booklcalendar.settings.ApiKeys
+import com.andreaszel.booklcalendar.settings.BookLanguages
+import com.andreaszel.booklcalendar.settings.LanguagePrefs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val keys: ApiKeys) : ViewModel() {
+class SettingsViewModel(private val keys: ApiKeys, private val languagePrefs: LanguagePrefs) : ViewModel() {
+    val languages: StateFlow<BookLanguages> = languagePrefs.languages
+
     private val _state = MutableStateFlow(SettingsUiState(draft = keys.googleBooks.value.orEmpty(), saved = keys.googleBooks.value != null, status = if (keys.googleBooks.value != null) KeyStatus.Saved else KeyStatus.None))
     val state: StateFlow<SettingsUiState> = _state
 
     fun onDraft(value: String) = _state.update { it.copy(draft = value) }
+
+    fun setLanguages(value: BookLanguages) = languagePrefs.set(value)
 
     fun save() {
         val key = _state.value.draft.trim()

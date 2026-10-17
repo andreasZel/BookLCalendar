@@ -1,9 +1,10 @@
 package com.andreaszel.booklcalendar.lookup
 
 import com.andreaszel.booklcalendar.settings.ApiKeys
+import com.andreaszel.booklcalendar.settings.LanguagePrefs
 import kotlinx.coroutines.CancellationException
 
-class OnlineBookLookup(private val keys: ApiKeys) : BookLookup {
+class OnlineBookLookup(private val keys: ApiKeys, private val languages: LanguagePrefs) : BookLookup {
     override suspend fun byIsbn(isbn: String): List<BookMatch> = firstOf({ GoogleBooks.search("isbn:$isbn", keys.googleBooks.value, 1).map { it.copy(isbn = isbn) } }, { OpenLibrary.byIsbn(isbn) }).take(1).map(::withCovers)
 
     override suspend fun search(query: String): List<BookMatch> = firstOf({ GoogleBooks.search(query, keys.googleBooks.value) }, { OpenLibrary.search(query) }).distinctBy { "${it.title.lowercase()}|${it.author.lowercase()}" }.take(MAX_MATCHES).map(::withCovers)

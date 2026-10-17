@@ -83,10 +83,15 @@ Branch `feat/21-achievements`
 - [ ] "New badge" pop-up once when one unlocks, unlock dates saved
 - [ ] Unit tests for each rule
 
-### #22 Book languages setting — todo
+### #22 Book languages setting — done
 Branch `feat/22-book-languages`
-- [ ] Setting in Settings, default from `Locale.getDefault()`, stored in prefs
-- [ ] Exposed from `AppContainer` to lookup and voice input
+- [x] Setting in Settings, default from `Locale.getDefault()`, stored in prefs
+  - `settings/BookLanguages.kt` (English, Greek, Both, `speechTag`), `settings/LanguagePrefs.kt` in `app_settings` prefs, which is backed up
+  - Greek device locale defaults to English + Greek, any other locale to English
+  - "Book languages" card with chips at the top of Settings
+- [x] Exposed from `AppContainer` (`languages`) to lookup and voice input. `OnlineBookLookup` receives it, used from #23
+- [x] Unit tests for the locale default, keys and speech tag
+- [ ] Visual check on a device or emulator
 
 ### #23 Greek search tuning — todo
 Branch `feat/23-greek-search`
