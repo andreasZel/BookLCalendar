@@ -6,6 +6,7 @@ import com.andreaszel.booklcalendar.data.Book
 import com.andreaszel.booklcalendar.data.BookRepository
 import com.andreaszel.booklcalendar.data.ReadLog
 import com.andreaszel.booklcalendar.data.ReadLogRepository
+import com.andreaszel.booklcalendar.data.Streak
 import com.andreaszel.booklcalendar.data.pagesPerDay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,10 +25,10 @@ class CalendarViewModel(books: BookRepository, logs: ReadLogRepository) : ViewMo
     private val selected = MutableStateFlow<LocalDate?>(null)
     private val monthLogs = month.flatMapLatest { current -> logs.observeMonth(current).map { current to it } }
 
-    val state: StateFlow<CalendarUiState> = combine(monthLogs, books.observeAll(), selected) { (current, list), shelf, day ->
+    val state: StateFlow<CalendarUiState> = combine(monthLogs, books.observeAll(), selected, logs.observeStreak()) { (current, list), shelf, day, streak ->
         val byId = shelf.associateBy { it.id }
         val entries = if (day == null) emptyList() else list.filter { it.date == day }.mapNotNull { log -> byId[log.bookId]?.let { DayEntry(log, it) } }
-        CalendarUiState(loaded = true, month = current, pages = pagesPerDay(list, current), selected = day, day = entries)
+        CalendarUiState(loaded = true, month = current, pages = pagesPerDay(list, current), selected = day, day = entries, streak = streak)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
 
     fun previous() = show(month.value.minusMonths(1))
@@ -48,6 +49,6 @@ class CalendarViewModel(books: BookRepository, logs: ReadLogRepository) : ViewMo
     }
 }
 
-data class CalendarUiState(val loaded: Boolean = false, val month: YearMonth = YearMonth.now(), val pages: Map<LocalDate, Int> = emptyMap(), val selected: LocalDate? = null, val day: List<DayEntry> = emptyList())
+data class CalendarUiState(val loaded: Boolean = false, val month: YearMonth = YearMonth.now(), val pages: Map<LocalDate, Int> = emptyMap(), val selected: LocalDate? = null, val day: List<DayEntry> = emptyList(), val streak: Streak = Streak())
 
 data class DayEntry(val log: ReadLog, val book: Book)

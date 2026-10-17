@@ -1,6 +1,7 @@
 package com.andreaszel.booklcalendar.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -12,6 +13,8 @@ class ReadLogRepository(private val dao: ReadLogDao) {
     fun observeForBook(bookId: Long): Flow<List<ReadLog>> = dao.observeForBook(bookId)
 
     fun observeAll(): Flow<List<ReadLog>> = dao.observeAll()
+
+    fun observeStreak(): Flow<Streak> = dao.observeDates().map { streakOf(it, LocalDate.now()) }
 
     suspend fun get(bookId: Long, date: LocalDate): ReadLog? = dao.get(bookId, date)
 
