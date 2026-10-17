@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 @Entity(tableName = "books")
-data class Book(@PrimaryKey(autoGenerate = true) val id: Long = 0, val title: String, val description: String, val readDate: LocalDate, val coverPath: String?, val coverSource: CoverSource?, val createdAt: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "") val author: String = "", val isbn: String? = null)
+data class Book(@PrimaryKey(autoGenerate = true) val id: Long = 0, val title: String, val description: String, val readDate: LocalDate, val coverPath: String?, val coverSource: CoverSource?, val createdAt: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "") val author: String = "", val isbn: String? = null, val totalPages: Int? = null)
 
 enum class CoverSource { Camera, Gallery, Online }
