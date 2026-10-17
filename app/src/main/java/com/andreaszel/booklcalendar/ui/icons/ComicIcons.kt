@@ -14,6 +14,7 @@ object ComicIcons {
     val Plus by lazy { icon(3f, Line("M12 5v14"), Line("M5 12h14")) }
     val Close by lazy { icon(3f, Line("M6 6l12 12"), Line("M18 6L6 18")) }
     val Back by lazy { icon(3f, Line("M15 5l-7 7 7 7")) }
+    val Next by lazy { icon(3f, Line("M9 5l7 7-7 7")) }
     val Edit by lazy { icon(2.4f, Line("M4 20h4L19 9l-4-4L4 16z"), Line("M13 7l4 4")) }
     val Trash by lazy { icon(2.4f, Line("M4 7h16"), Line("M9 7V4h6v3"), Line("M6 7l1 13h10l1-13")) }
     val Camera by lazy { icon(2.4f, Line("M3 8h4l2-3h6l2 3h4v12H3z"), Line(circle(12f, 13.5f, 3.5f))) }

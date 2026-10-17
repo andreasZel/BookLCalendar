@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -45,19 +46,22 @@ import com.andreaszel.booklcalendar.ui.theme.dashedComic
 import java.time.LocalDate
 
 @Composable
-fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Unit) {
+fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Unit, onCalendar: () -> Unit) {
     val vm = appViewModel { ShelfViewModel(it.books) }
     val state by vm.state.collectAsStateWithLifecycle()
     val today = remember { LocalDate.now() }
     val filtering = state.query.isNotBlank()
+    val roomy = LocalConfiguration.current.screenWidthDp >= 400
 
     BackHandler(enabled = state.searching) { vm.closeSearch() }
 
     Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = 10.dp)) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(Dimens.Touch).comic(Palette.Yellow, shadow = 2.dp)) {
-                    ComicIcon(ComicIcons.Book, size = 24.dp)
+                if (roomy) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(Dimens.Touch).comic(Palette.Yellow, shadow = 2.dp)) {
+                        ComicIcon(ComicIcons.Book, size = 24.dp)
+                    }
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("My Bookshelf", style = TextStyles.Heading.copy(fontSize = 26.sp, lineHeight = 29.sp), modifier = Modifier.semantics { heading() })
@@ -66,6 +70,7 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Uni
                 if (!state.searching && state.books.isNotEmpty()) {
                     ComicIconButton(icon = ComicIcons.Search, label = "Search shelf", fill = Palette.Sky, onClick = vm::openSearch)
                 }
+                ComicIconButton(icon = ComicIcons.Calendar, label = "Reading calendar", fill = Palette.Lilac, onClick = onCalendar)
                 ComicIconButton(icon = ComicIcons.Key, label = "Settings", onClick = onSettings)
             }
 

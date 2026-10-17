@@ -44,12 +44,16 @@ Branch `feat/16-read-log-data`
 - [x] Repository methods + wiring in `AppContainer`
 - [x] Unit tests for month aggregation (pages per day)
 
-### #17 Calendar screen — todo
-Branch `feat/17-calendar`
-- [ ] Month grid, Monday first, heat dots by pages read, today ring, swipe or arrows between months
-- [ ] Tap a day to open a sheet with that day's logs (cover, pages, note)
-- [ ] Calendar button in the shelf header, `calendar` route in `ui/AppNavHost.kt`
-- [ ] Empty state for days and months with no reading
+### #17 Calendar screen — done
+Branch `feat/17-calendar` (from `master`, independent of #15)
+- [x] Month grid, Monday first, heat dots by pages read, today ring, swipe or arrows between months
+  - Dot colour by pages that day: under 20, 20–49, 50+ (a 0-page log still gets the lightest dot). Legend under the grid
+  - Future days are muted and can't be tapped
+- [x] Tap a day to open a sheet with that day's logs (cover, pages, note). A row opens the book's details
+- [x] Calendar button in the shelf header, `calendar` route in `ui/AppNavHost.kt`. The shelf's book badge hides under 400dp width so the title fits next to 4 buttons
+- [x] Empty state for days and months with no reading
+- [x] Unit tests for month cells, heat levels and labels
+- [ ] Visual check on a device or emulator
 
 ### #18 Log a read — todo
 Branch `feat/18-log-read`
