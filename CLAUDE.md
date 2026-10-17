@@ -6,6 +6,7 @@
 4. The `prepare-commit-msg` hook adds `[<issue>]` to commit messages, don't type it
 5. Never commit `.env`, stage files by path
 6. Issues and pull requests are managed with `node scripts/github.mjs`, `gh` is not installed
+7. No `Co-Authored-By` or "Generated with Claude Code" lines in commits or pull requests
 
 # Read Rules
 
