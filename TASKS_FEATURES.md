@@ -31,11 +31,11 @@ New functionality after #1–#7. Issues #15–#25, one per task.
 
 ## Progress
 
-### #15 Fix: "Find online" button cropped on the right — todo
+### #15 Fix: "Find online" button cropped on the right — done
 Branch `fix/15-find-online-crop`
-- [ ] Button row in `ui/add/AddBookScreen.kt:162` uses `padding(end = 2.dp, bottom = 2.dp)`, but `ComicButton` draws a 3dp shadow and the cream card clips it. Match the padding to the shadow
-- [ ] Stop "Scan ISBN" from squeezing the label: single-line label with ellipsis, or equal weights for both buttons
-- [ ] Check on a 360dp-wide screen with the longest label ("Find by title")
+- [x] Button row in `ui/add/AddBookScreen.kt:162` uses `padding(end = 2.dp, bottom = 2.dp)`, but `ComicButton` draws a 3dp shadow and the cream card clips it. Match the padding to the shadow
+- [x] Stop "Scan ISBN" from squeezing the label: `ComicButton` labels are single-line with ellipsis, "Scan ISBN" keeps its width and the lookup button takes the rest. Tighter inner padding (10dp) and icon gap (6dp) in this row
+- [ ] Check on a 360dp-wide screen with the longest label ("Find by title"), needs a device or emulator
 
 ### #16 Reading log data — done
 Branch `feat/16-read-log-data`
