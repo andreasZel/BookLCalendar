@@ -1,5 +1,8 @@
 package com.andreaszel.booklcalendar.ui.log
 
+import android.content.ActivityNotFoundException
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
@@ -50,11 +54,14 @@ import java.util.UUID
 @Composable
 fun LogReadSheet(bookId: Long, date: LocalDate, onDismiss: () -> Unit) {
     val session = rememberSaveable { UUID.randomUUID().toString() }
-    val vm = appViewModel(key = "log-$session") { LogReadViewModel(bookId, date, it.books, it.logs) }
+    val vm = appViewModel(key = "log-$session") { LogReadViewModel(bookId, date, it.books, it.logs, it.languages) }
     val state by vm.state.collectAsStateWithLifecycle()
     val sheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val today = remember { LocalDate.now() }
     var confirming by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    var canSpeak by remember { mutableStateOf(SpeechInput.available(context)) }
+    val speech = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> SpeechInput.text(result)?.let(vm::onSpoken) }
     val book = state.book
     val editing = state.existing != null
 
@@ -107,7 +114,12 @@ fun LogReadSheet(bookId: Long, date: LocalDate, onDismiss: () -> Unit) {
                         Spacer(modifier = Modifier.weight(1f))
                         Text("${state.note.length} / ${ReadLog.NOTE_LIMIT}", style = TextStyles.Strong.copy(fontSize = 12.sp, color = if (state.note.length >= ReadLog.NOTE_LIMIT) Palette.Error else Palette.Muted), modifier = Modifier.padding(bottom = 2.dp))
                     }
-                    ComicTextField(value = state.note, onChange = vm::onNote, placeholder = "A line you liked, how it felt…", fontSize = 15.sp, singleLine = false, minLines = 3, label = "Note")
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top, modifier = Modifier.padding(end = 3.dp, bottom = 3.dp)) {
+                        ComicTextField(value = state.note, onChange = vm::onNote, placeholder = "A line you liked, how it felt…", fontSize = 15.sp, singleLine = false, minLines = 3, label = "Note", modifier = Modifier.weight(1f))
+                        if (canSpeak) {
+                            ComicIconButton(icon = ComicIcons.Mic, label = "Speak a note", fill = Palette.Sky, onClick = { try { speech.launch(SpeechInput.intent(vm.speechTag)) } catch (e: ActivityNotFoundException) { canSpeak = false } })
+                        }
+                    }
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {

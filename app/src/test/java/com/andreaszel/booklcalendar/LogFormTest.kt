@@ -2,6 +2,7 @@ package com.andreaszel.booklcalendar
 
 import com.andreaszel.booklcalendar.data.ReadLog
 import com.andreaszel.booklcalendar.ui.detail.readingSummary
+import com.andreaszel.booklcalendar.ui.log.appendNote
 import com.andreaszel.booklcalendar.ui.log.cleanPages
 import com.andreaszel.booklcalendar.ui.log.cutNote
 import com.andreaszel.booklcalendar.ui.log.parsePages
@@ -40,6 +41,22 @@ class LogFormTest {
     fun cutNoteStopsAtLimit() {
         assertEquals(ReadLog.NOTE_LIMIT, cutNote("a".repeat(400)).length)
         assertEquals("short", cutNote("short"))
+    }
+
+    @Test
+    fun appendNoteJoinsSpokenTextWithOneSpace() {
+        assertEquals("Ωραίο κεφάλαιο", appendNote("", "  Ωραίο κεφάλαιο "))
+        assertEquals("Great start. Loved it", appendNote("Great start.", "Loved it"))
+        assertEquals("Line one\nLoved it", appendNote("Line one\n", "Loved it"))
+        assertEquals("Loved it", appendNote("   ", "Loved it"))
+        assertEquals("Kept", appendNote("Kept", "  "))
+    }
+
+    @Test
+    fun appendNoteCutsAtLimit() {
+        val note = "a".repeat(ReadLog.NOTE_LIMIT - 3)
+        assertEquals(note + " bb", appendNote(note, "bbbbbb"))
+        assertEquals(ReadLog.NOTE_LIMIT, appendNote("a".repeat(ReadLog.NOTE_LIMIT), "more").length)
     }
 
     @Test

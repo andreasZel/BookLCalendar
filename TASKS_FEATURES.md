@@ -64,12 +64,16 @@ Branch `feat/18-log-read`
 - [x] Unit tests for the pages/note helpers and the reading summary
 - [ ] Visual check on a device or emulator
 
-### #19 Voice notes — todo
+### #19 Voice notes — done
 Branch `feat/19-voice-notes`
-- [ ] Mic button on the note field launches `RecognizerIntent.ACTION_RECOGNIZE_SPEECH`
-- [ ] Language from the Book languages setting (`el-GR` / `en-US`)
-- [ ] Recognized text is appended to the note, then cut to 280 chars
-- [ ] Mic hidden when no recognizer is available (`SpeechRecognizer.isRecognitionAvailable`)
+- [x] Mic button on the note field launches `RecognizerIntent.ACTION_RECOGNIZE_SPEECH`
+  - `ui/log/SpeechInput.kt` builds the intent and reads the first result. Sky mic button next to the note field
+- [x] Language from the Book languages setting (`el-GR` / `en-US`), read from `LanguagePrefs` when the mic is tapped
+- [x] Recognized text is appended to the note, then cut to 280 chars (`appendNote` in `ui/log/LogForm.kt`, one space between)
+- [x] Mic hidden when no recognizer is available (`SpeechRecognizer.isRecognitionAvailable`), or after the launch fails
+  - `<queries>` for `RecognitionService` and `RECOGNIZE_SPEECH` in the manifest, needed on Android 11+
+- [x] Unit tests for `appendNote`
+- [ ] Check Greek and English dictation on a device
 
 ### #20 Streaks — todo
 Branch `feat/20-streaks`

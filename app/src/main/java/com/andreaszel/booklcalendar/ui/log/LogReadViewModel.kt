@@ -6,6 +6,7 @@ import com.andreaszel.booklcalendar.data.Book
 import com.andreaszel.booklcalendar.data.BookRepository
 import com.andreaszel.booklcalendar.data.ReadLog
 import com.andreaszel.booklcalendar.data.ReadLogRepository
+import com.andreaszel.booklcalendar.settings.LanguagePrefs
 import com.andreaszel.booklcalendar.ui.shelf.filterBooks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class LogReadViewModel(bookId: Long, private val date: LocalDate, books: BookRepository, private val logs: ReadLogRepository) : ViewModel() {
+class LogReadViewModel(bookId: Long, private val date: LocalDate, books: BookRepository, private val logs: ReadLogRepository, private val languages: LanguagePrefs) : ViewModel() {
     private val form = MutableStateFlow(LogDraft())
 
     val state: StateFlow<LogReadUiState> = combine(books.observeAll(), form) { shelf, draft ->
@@ -34,6 +35,10 @@ class LogReadViewModel(bookId: Long, private val date: LocalDate, books: BookRep
     fun step(delta: Int) = form.update { it.copy(pages = stepPages(it.pages, delta)) }
 
     fun onNote(value: String) = form.update { it.copy(note = cutNote(value)) }
+
+    val speechTag: String get() = languages.languages.value.speechTag
+
+    fun onSpoken(text: String) = form.update { it.copy(note = appendNote(it.note, text)) }
 
     // An existing log for that day replaces the typed values
     fun pick(id: Long) {
