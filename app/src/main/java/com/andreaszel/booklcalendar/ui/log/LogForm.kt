@@ -13,3 +13,9 @@ fun stepPages(text: String, delta: Int): String = (parsePages(text) + delta).coe
 fun cutNote(text: String): String = text.take(ReadLog.NOTE_LIMIT)
 
 fun parseTotalPages(text: String): Int? = text.toIntOrNull()?.takeIf { it in 1..MAX_PAGES }
+
+fun appendNote(note: String, spoken: String): String {
+    val words = spoken.trim()
+    if (words.isEmpty()) return note
+    return cutNote(if (note.isBlank()) words else if (note.last().isWhitespace()) note + words else "$note $words")
+}
