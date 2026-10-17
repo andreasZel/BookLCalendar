@@ -81,5 +81,6 @@ Branch `feat/6-book-lookup` (cut from `feat/7-shelf-search`, replaces the stub "
 
 ## Next
 
+- New features (#15–#25) are tracked in `TASKS_FEATURES.md`
 - Visual check of #5, #7 and #6 on a device with Google Play services
 - Push branches #1–#7, open PRs (stacked: #3 on #2, #4 on #3, #5 on #4, #7 on #5, #6 on #7)

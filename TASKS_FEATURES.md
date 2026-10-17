@@ -1,0 +1,109 @@
+# Feature Tasks
+
+New functionality after #1–#7. Issues #15–#25, one per task.
+
+## Decisions
+
+### Services and cost
+- Google Books API is free: no billing and no credits. Each Cloud project has a daily request quota (commonly 1,000/day). The anonymous shared quota is often used up (it returned 429 during research), so a personal key is still recommended
+- Google Chirp (Cloud Speech-to-Text V2) is paid: 60 free minutes/month, then about $0.016/min. It needs a billing-enabled Cloud project and a key or backend, so it is not used
+- Voice input uses Android's built-in speech recognizer (`RecognizerIntent`): free, no key, supports Greek. It runs on the phone on Android 12+ when the language pack is installed, otherwise Google's free system service handles it. No RECORD_AUDIO permission is needed because the system dialog records
+
+### Reading calendar
+- A day holds at most one `ReadLog` per shelf book: `id`, `bookId`, `date`, `pagesRead`, `note` (max 280 chars), `createdAt`
+- Unique index on `bookId + date`. Logging the same book on the same day again edits the existing log. Deleting a book deletes its logs (foreign key cascade)
+- `Book` gets an optional `totalPages` that drives a progress bar (sum of `pagesRead` / `totalPages`)
+- Room auto-migration 2 → 3 adds the `read_logs` table and `books.totalPages`
+
+### Streaks and achievements
+- Streak: consecutive days with at least one log. Today with no log yet doesn't break it until the day ends
+- Achievements are calculated from books and logs, not stored. Only the unlock date of each badge is saved (DataStore/prefs), so the "new badge" pop-up shows once
+- Badges use the comic style (ink outline, offset shadow, palette colours). Locked badges are greyed with a dotted outline
+
+### Greek books
+- Why Greek lookups fail today:
+  - `lookup/CoverReader.kt` uses ML Kit's Latin recognizer. ML Kit v2 has no Greek script, so Greek covers can't be read
+  - Open Library has thin Greek coverage. "Ζορμπά" returns one result
+  - `lookup/Wikipedia.kt` only queries `en.wikipedia.org`
+  - Google Books searches with no language hint
+- "Book languages" setting: default comes from the device locale (Greek on when the locale is `el`). It can be changed in Settings: English, Greek, or English + Greek. It controls Greek OCR, `langRestrict`, Wikipedia language and Biblionet
+- Biblionet (biblionet.gr/webservice, `get_title` by ISBN) is the Greek books database. It needs credentials approved by Biblionet, entered in Settings like the Google key and kept out of backups
+
+## Progress
+
+### #15 Fix: "Find online" button cropped on the right — todo
+Branch `fix/15-find-online-crop`
+- [ ] Button row in `ui/add/AddBookScreen.kt:162` uses `padding(end = 2.dp, bottom = 2.dp)`, but `ComicButton` draws a 3dp shadow and the cream card clips it. Match the padding to the shadow
+- [ ] Stop "Scan ISBN" from squeezing the label: single-line label with ellipsis, or equal weights for both buttons
+- [ ] Check on a 360dp-wide screen with the longest label ("Find by title")
+
+### #16 Reading log data — done
+Branch `feat/16-read-log-data`
+- [x] `ReadLog` entity, `ReadLogDao` (by month, by day, by book, upsert, delete)
+- [x] `totalPages` on `Book`, auto-migration 2 → 3, export schema
+- [x] Repository methods + wiring in `AppContainer`
+- [x] Unit tests for month aggregation (pages per day)
+
+### #17 Calendar screen — todo
+Branch `feat/17-calendar`
+- [ ] Month grid, Monday first, heat dots by pages read, today ring, swipe or arrows between months
+- [ ] Tap a day to open a sheet with that day's logs (cover, pages, note)
+- [ ] Calendar button in the shelf header, `calendar` route in `ui/AppNavHost.kt`
+- [ ] Empty state for days and months with no reading
+
+### #18 Log a read — todo
+Branch `feat/18-log-read`
+- [ ] Bottom sheet: pick a shelf book (searchable), pages stepper + number field, note field
+- [ ] Opens prefilled when that book already has a log on that day, with a delete option
+- [ ] "Log reading" button on book details, prefilled with the book and today
+- [ ] Total pages field in the add/edit form, progress bar on details when set
+
+### #19 Voice notes — todo
+Branch `feat/19-voice-notes`
+- [ ] Mic button on the note field launches `RecognizerIntent.ACTION_RECOGNIZE_SPEECH`
+- [ ] Language from the Book languages setting (`el-GR` / `en-US`)
+- [ ] Recognized text is appended to the note, then cut to 280 chars
+- [ ] Mic hidden when no recognizer is available (`SpeechRecognizer.isRecognitionAvailable`)
+
+### #20 Streaks — todo
+Branch `feat/20-streaks`
+- [ ] Pure functions for current and best streak from log dates + unit tests (gaps, today open, month edges)
+- [ ] Flame pill with the current streak in the shelf and calendar headers
+
+### #21 Achievements and badges — todo
+Branch `feat/21-achievements`
+- [ ] Badge rules: first book, 5 / 25 / 100 books, 7 / 30 / 100-day streaks, 1,000 / 10,000 pages, first finished book, first Greek book, a book every month for a year
+- [ ] Achievements screen: unlocked badges with date, locked badges with progress ("12 / 25 books")
+- [ ] "New badge" pop-up once when one unlocks, unlock dates saved
+- [ ] Unit tests for each rule
+
+### #22 Book languages setting — todo
+Branch `feat/22-book-languages`
+- [ ] Setting in Settings, default from `Locale.getDefault()`, stored in prefs
+- [ ] Exposed from `AppContainer` to lookup and voice input
+
+### #23 Greek search tuning — todo
+Branch `feat/23-greek-search`
+- [ ] Detect Greek script in the query, then add `langRestrict=el` in `lookup/GoogleBooks.kt`. Retry without it when there are no results
+- [ ] Accent- and final-sigma-insensitive matching and dedupe in `lookup/OnlineBookLookup.kt`
+- [ ] `lookup/Wikipedia.kt` uses `el.wikipedia.org` for Greek titles, with Greek "bookish" keywords (μυθιστόρημα, βιβλίο, ποίηση…)
+- [ ] Unit tests with Greek fixtures
+
+### #24 Greek cover OCR — todo
+Branch `feat/24-greek-ocr`
+- [ ] Tesseract4Android with `ell` + `eng` traineddata, downloaded on first use (not in the APK) to app storage
+- [ ] `lookup/CoverReader.kt` uses Tesseract when Greek is on or ML Kit finds no usable text
+- [ ] Progress and error messages for the model download
+- [ ] Check that the APK size increase is acceptable
+
+### #25 Biblionet ISBN lookup — todo
+Branch `feat/25-biblionet`
+- [ ] Biblionet username/password in Settings (`settings/ApiKeys.kt`), test and remove, kept out of backups
+- [ ] Greek ISBNs (978-960, 978-618) go to Biblionet first, then the existing chain
+- [ ] Parse `Title`, `WriterName`, `Summary`, `CoverImage` (relative path on biblionet.gr) into `BookMatch`
+- [ ] Parse tests from a saved sample response
+- [ ] README: how to request Biblionet access
+
+## Next
+
+- Order: #15 (quick fix) → #16 → #17 → #18 → #19 → #20 → #21. The Greek tasks #22 → #23 → #24 → #25 can run in parallel; #19 needs #22 for the voice language
