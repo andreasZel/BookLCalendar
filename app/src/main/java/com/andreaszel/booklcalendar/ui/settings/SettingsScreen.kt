@@ -2,6 +2,7 @@ package com.andreaszel.booklcalendar.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -25,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andreaszel.booklcalendar.ui.appViewModel
+import com.andreaszel.booklcalendar.settings.BookLanguages
 import com.andreaszel.booklcalendar.ui.components.ComicButton
+import com.andreaszel.booklcalendar.ui.components.ComicChip
 import com.andreaszel.booklcalendar.ui.components.ComicIconButton
 import com.andreaszel.booklcalendar.ui.components.ComicTextField
 import com.andreaszel.booklcalendar.ui.components.InfoPill
@@ -37,8 +41,9 @@ import com.andreaszel.booklcalendar.ui.theme.comic
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
-    val vm = appViewModel { SettingsViewModel(it.keys) }
+    val vm = appViewModel { SettingsViewModel(it.keys, it.languages) }
     val state by vm.state.collectAsStateWithLifecycle()
+    val languages by vm.languages.collectAsStateWithLifecycle()
     val status = statusCopy.getValue(state.status)
 
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
@@ -48,6 +53,16 @@ fun SettingsScreen(onBack: () -> Unit) {
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth().comic(Palette.White, radius = Dimens.RadiusBig).padding(16.dp)) {
+                Text("Book languages", style = TextStyles.Label.copy(fontSize = 20.sp))
+                Text("The languages your books are in. Used to read covers, search online and listen to voice notes.", style = TextStyles.Body.copy(fontSize = 14.sp, color = Palette.MutedDeep))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Book languages" }) {
+                    BookLanguages.entries.forEach { option ->
+                        ComicChip(label = languageLabels.getValue(option), selected = option == languages, onClick = { vm.setLanguages(option) })
+                    }
+                }
+            }
+
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth().comic(Palette.White, radius = Dimens.RadiusBig).padding(16.dp)) {
                 Text("Book lookup", style = TextStyles.Label.copy(fontSize = 20.sp))
                 Text("Titles, authors, descriptions and covers come from Google Books, Open Library and Wikipedia. They're free and work without any setup.", style = TextStyles.Body.copy(fontSize = 14.sp, color = Palette.MutedDeep))
@@ -71,6 +86,8 @@ fun SettingsScreen(onBack: () -> Unit) {
         }
     }
 }
+
+private val languageLabels = mapOf(BookLanguages.English to "English", BookLanguages.Greek to "Greek", BookLanguages.Both to "English + Greek")
 
 private val statusCopy = mapOf(KeyStatus.None to Status("No key, using the shared quota", ComicIcons.Book, Palette.Paper), KeyStatus.Saved to Status("Key saved on this phone", ComicIcons.Key, Palette.Sky), KeyStatus.Working to Status("Key saved and working", ComicIcons.Check, Palette.Sky), KeyStatus.Untested to Status("Saved, couldn't test it offline", ComicIcons.Key, Palette.Yellow), KeyStatus.Rejected to Status("Google rejected this key, not saved", ComicIcons.Close, Palette.Coral))
 

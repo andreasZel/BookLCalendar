@@ -9,6 +9,7 @@ import com.andreaszel.booklcalendar.lookup.BookLookup
 import com.andreaszel.booklcalendar.lookup.CoverReader
 import com.andreaszel.booklcalendar.lookup.OnlineBookLookup
 import com.andreaszel.booklcalendar.settings.ApiKeys
+import com.andreaszel.booklcalendar.settings.LanguagePrefs
 
 class AppContainer(context: Context) {
     private val database = AppDatabase.create(context)
@@ -16,6 +17,7 @@ class AppContainer(context: Context) {
     val books = BookRepository(database.bookDao(), covers)
     val logs = ReadLogRepository(database.readLogDao())
     val keys = ApiKeys(context)
-    val lookup: BookLookup = OnlineBookLookup(keys)
+    val languages = LanguagePrefs(context)
+    val lookup: BookLookup = OnlineBookLookup(keys, languages)
     val coverReader = CoverReader(context)
 }
