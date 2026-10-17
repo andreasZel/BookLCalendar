@@ -159,9 +159,9 @@ fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().comic(Palette.Cream, radius = Dimens.RadiusBig, shadow = 0.dp).padding(14.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(end = 2.dp, bottom = 2.dp)) {
-                    ComicButton(text = copy.label, onClick = vm::findOnline, enabled = copy.enabled, icon = ComicIcons.Sparkle, fill = if (copy.enabled || state.busy) Palette.Lilac else Palette.DisabledLight, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).alpha(if (copy.enabled || state.busy) 1f else 0.6f))
-                    ComicButton(text = "Scan ISBN", onClick = scan, enabled = !state.busy, icon = ComicIcons.Barcode, fill = Palette.Sky, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(end = 3.dp, bottom = 3.dp)) {
+                    ComicButton(text = copy.label, onClick = vm::findOnline, enabled = copy.enabled, icon = ComicIcons.Sparkle, fill = if (copy.enabled || state.busy) Palette.Lilac else Palette.DisabledLight, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 10.dp), gap = 6.dp, modifier = Modifier.weight(1f).alpha(if (copy.enabled || state.busy) 1f else 0.6f))
+                    ComicButton(text = "Scan ISBN", onClick = scan, enabled = !state.busy, icon = ComicIcons.Barcode, fill = Palette.Sky, height = 46.dp, radius = 23.dp, fontSize = 15.sp, padding = PaddingValues(horizontal = 10.dp), gap = 6.dp)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(copy.hint, style = TextStyles.Body.copy(fontSize = 13.sp, color = Palette.MutedDeep), modifier = Modifier.weight(1f))
