@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.andreaszel.booklcalendar.ui.DateLabels
+import com.andreaszel.booklcalendar.ui.components.ComicButton
 import com.andreaszel.booklcalendar.ui.components.ComicIcon
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
 import com.andreaszel.booklcalendar.ui.theme.Palette
@@ -29,7 +30,7 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DaySheet(date: LocalDate, entries: List<DayEntry>, today: LocalDate, onDismiss: () -> Unit, onOpen: (Long) -> Unit) {
+fun DaySheet(date: LocalDate, entries: List<DayEntry>, today: LocalDate, onDismiss: () -> Unit, onOpen: (Long) -> Unit, onLog: () -> Unit) {
     val sheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val pages = entries.sumOf { it.log.pagesRead }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheet, containerColor = Palette.Paper, contentColor = Palette.Ink, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)) {
@@ -42,12 +43,13 @@ fun DaySheet(date: LocalDate, entries: List<DayEntry>, today: LocalDate, onDismi
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().dashedComic(Palette.White).padding(horizontal = 20.dp, vertical = 22.dp)) {
                     ComicIcon(ComicIcons.Book, size = 36.dp)
                     Text("No reading logged", textAlign = TextAlign.Center, style = TextStyles.Label.copy(fontSize = 17.sp))
-                    Text("Pages you log for this day show up here.", textAlign = TextAlign.Center, style = TextStyles.Body.copy(fontSize = 14.sp, color = Palette.Muted))
+                    Text("Tap Log reading to add the pages you read.", textAlign = TextAlign.Center, style = TextStyles.Body.copy(fontSize = 14.sp, color = Palette.Muted))
                 }
             }
             entries.forEach { entry ->
                 LogRow(book = entry.book, log = entry.log, onClick = { onOpen(entry.book.id) })
             }
+            ComicButton(text = "Log reading", onClick = onLog, icon = ComicIcons.Plus, fill = Palette.Yellow, modifier = Modifier.fillMaxWidth().padding(end = 3.dp, bottom = 3.dp))
         }
     }
 }

@@ -51,6 +51,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -200,6 +201,14 @@ fun AddBookScreen(bookId: Long, onDone: () -> Unit) {
                     Text("optional", style = TextStyles.Strong.copy(fontSize = 12.sp, color = Palette.Muted), modifier = Modifier.padding(bottom = 2.dp))
                 }
                 ComicTextField(value = state.author, onChange = vm::onAuthor, placeholder = "e.g. Antoine de Saint-Exupéry", fontSize = 16.sp, capitalization = KeyboardCapitalization.Words)
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Total pages", style = TextStyles.Label.copy(fontSize = 16.sp))
+                    Text("optional, shows your progress", style = TextStyles.Strong.copy(fontSize = 12.sp, color = Palette.Muted), modifier = Modifier.padding(bottom = 2.dp))
+                }
+                ComicTextField(value = state.totalPages, onChange = vm::onTotalPages, placeholder = "e.g. 96", fontSize = 16.sp, keyboardType = KeyboardType.Number, label = "Total pages", modifier = Modifier.width(160.dp))
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

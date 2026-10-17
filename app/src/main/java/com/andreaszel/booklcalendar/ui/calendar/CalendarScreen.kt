@@ -20,7 +20,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -38,6 +41,7 @@ import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.ComicIcon
 import com.andreaszel.booklcalendar.ui.components.ComicIconButton
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
+import com.andreaszel.booklcalendar.ui.log.LogReadSheet
 import com.andreaszel.booklcalendar.ui.theme.Dimens
 import com.andreaszel.booklcalendar.ui.theme.Palette
 import com.andreaszel.booklcalendar.ui.theme.TextStyles
@@ -52,6 +56,7 @@ fun CalendarScreen(onBack: () -> Unit, onOpen: (Long) -> Unit) {
     val today = remember { LocalDate.now() }
     val total = state.pages.values.sum()
     val selected = state.selected
+    var logging by rememberSaveable { mutableStateOf<LocalDate?>(null) }
 
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = 10.dp)) {
@@ -110,6 +115,11 @@ fun CalendarScreen(onBack: () -> Unit, onOpen: (Long) -> Unit) {
     }
 
     if (selected != null) {
-        DaySheet(date = selected, entries = state.day, today = today, onDismiss = vm::closeDay, onOpen = { vm.closeDay(); onOpen(it) })
+        DaySheet(date = selected, entries = state.day, today = today, onDismiss = vm::closeDay, onOpen = { vm.closeDay(); onOpen(it) }, onLog = { logging = selected; vm.closeDay() })
+    }
+
+    val logDate = logging
+    if (logDate != null) {
+        LogReadSheet(bookId = 0L, date = logDate, onDismiss = { logging = null; vm.openDay(logDate) })
     }
 }

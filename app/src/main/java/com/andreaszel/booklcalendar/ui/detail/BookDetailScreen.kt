@@ -40,20 +40,26 @@ import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.BookCover
 import com.andreaszel.booklcalendar.ui.components.ComicButton
 import com.andreaszel.booklcalendar.ui.components.ComicIconButton
+import com.andreaszel.booklcalendar.ui.components.ComicProgress
 import com.andreaszel.booklcalendar.ui.components.InfoPill
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
+import com.andreaszel.booklcalendar.ui.log.LogReadSheet
 import com.andreaszel.booklcalendar.ui.theme.Dimens
 import com.andreaszel.booklcalendar.ui.theme.Palette
 import com.andreaszel.booklcalendar.ui.theme.TextStyles
 import com.andreaszel.booklcalendar.ui.theme.bleed
 import com.andreaszel.booklcalendar.ui.theme.comic
+import java.time.LocalDate
+import kotlin.math.roundToInt
 
 @Composable
 fun BookDetailScreen(bookId: Long, onBack: () -> Unit, onEdit: (Long) -> Unit) {
-    val vm = appViewModel(key = "detail-$bookId") { BookDetailViewModel(bookId, it.books) }
+    val vm = appViewModel(key = "detail-$bookId") { BookDetailViewModel(bookId, it.books, it.logs) }
     val state by vm.state.collectAsStateWithLifecycle()
     var confirming by rememberSaveable { mutableStateOf(false) }
+    var logging by rememberSaveable { mutableStateOf(false) }
     val book = state.book
+    val progress = state.progress
 
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)) {
@@ -93,6 +99,19 @@ fun BookDetailScreen(bookId: Long, onBack: () -> Unit, onEdit: (Long) -> Unit) {
                             InfoPill(text = when (book.coverSource) { CoverSource.Camera -> "Photo from camera"; CoverSource.Online -> "Cover found online"; else -> "Photo from gallery" }, icon = when (book.coverSource) { CoverSource.Camera -> ComicIcons.Camera; CoverSource.Online -> ComicIcons.Book; else -> ComicIcons.Gallery }, fill = Palette.Paper, fontSize = 13.sp, iconSize = 16.dp, vertical = 6.dp, horizontal = 12.dp)
                         }
                     }
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().comic(Palette.Paper, shadow = 0.dp).padding(14.dp)) {
+                        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("Reading", style = TextStyles.Label.copy(fontSize = 15.sp), modifier = Modifier.weight(1f))
+                            if (progress != null) {
+                                Text("${(progress * 100).roundToInt()}%", style = TextStyles.Label.copy(fontSize = 15.sp))
+                            }
+                        }
+                        if (progress != null) {
+                            ComicProgress(progress = progress)
+                        }
+                        Text(readingSummary(pagesRead = state.pagesRead, days = state.days, totalPages = book.totalPages), style = TextStyles.Body.copy(fontSize = 14.sp, color = if (state.days == 0) Palette.Muted else Palette.Ink))
+                        ComicButton(text = "Log reading", onClick = { logging = true }, icon = ComicIcons.Plus, fill = Palette.Yellow, height = 48.dp, fontSize = 16.sp, modifier = Modifier.fillMaxWidth().padding(end = 3.dp, bottom = 3.dp))
+                    }
                     Column(modifier = Modifier.fillMaxWidth().comic(Palette.Cream, shadow = 0.dp).padding(14.dp)) {
                         Text("Description", style = TextStyles.Label.copy(fontSize = 15.sp), modifier = Modifier.padding(bottom = 4.dp))
                         Text(book.description.ifBlank { "No description yet. Tap the pencil to add one." }, style = TextStyles.Body.copy(fontSize = 15.sp, lineHeight = 22.sp, color = if (book.description.isBlank()) Palette.Muted else Palette.Ink))
@@ -100,6 +119,10 @@ fun BookDetailScreen(bookId: Long, onBack: () -> Unit, onEdit: (Long) -> Unit) {
                 }
             }
         }
+    }
+
+    if (logging && book != null) {
+        LogReadSheet(bookId = book.id, date = LocalDate.now(), onDismiss = { logging = false })
     }
 
     if (confirming && book != null) {
