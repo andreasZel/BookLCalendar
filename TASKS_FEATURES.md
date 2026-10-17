@@ -75,10 +75,14 @@ Branch `feat/19-voice-notes`
 - [x] Unit tests for `appendNote`
 - [ ] Check Greek and English dictation on a device
 
-### #20 Streaks — todo
+### #20 Streaks — done
 Branch `feat/20-streaks`
-- [ ] Pure functions for current and best streak from log dates + unit tests (gaps, today open, month edges)
-- [ ] Flame pill with the current streak in the shelf and calendar headers
+- [x] Pure functions for current and best streak from log dates + unit tests (gaps, today open, month edges)
+  - `data/Streaks.kt` (`currentStreak`, `bestStreak`, `streakOf`), future dates ignored. `ReadLogRepository.observeStreak()` over a distinct-dates query
+- [x] Flame pill with the current streak in the shelf and calendar headers
+  - `ui/components/StreakPill.kt`, yellow pill with a coral flame, next to the subtitle so narrow headers keep their buttons. Hidden at 0, screen readers hear the best streak too
+  - Streak is recomputed when logs change or the screen reopens, not exactly at midnight
+- [ ] Visual check on a device or emulator
 
 ### #21 Achievements and badges — todo
 Branch `feat/21-achievements`

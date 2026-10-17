@@ -22,6 +22,9 @@ interface ReadLogDao {
     @Query("SELECT * FROM read_logs ORDER BY date")
     fun observeAll(): Flow<List<ReadLog>>
 
+    @Query("SELECT DISTINCT date FROM read_logs ORDER BY date")
+    fun observeDates(): Flow<List<LocalDate>>
+
     @Query("SELECT * FROM read_logs WHERE bookId = :bookId AND date = :date")
     suspend fun get(bookId: Long, date: LocalDate): ReadLog?
 

@@ -27,6 +27,7 @@ object ComicIcons {
     val Key by lazy { icon(2.4f, Line(circle(8f, 16f, 4.5f)), Line("M11.2 12.8L20 4M16.5 7.5l3 3M14 10l2 2")) }
     val Search by lazy { icon(2.6f, Line(circle(10.5f, 10.5f, 6.5f)), Line("M15.5 15.5L21 21")) }
     val Mic by lazy { icon(2.4f, Line("M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0z"), Line("M5 11a7 7 0 0 0 14 0"), Line("M12 18v3M8 21h8")) }
+    val Flame by lazy { icon(2.2f, Line("M12 2c1 4 6 6.5 6 12a6 6 0 0 1-12 0c0-3 1.5-5 3-6.5.3 2 1.2 3 2.5 3.5C11 8 11 5 12 2z", Palette.Coral), Line("M12 21a2.5 2.5 0 0 1-2.5-2.5c0-1.5 1.2-2.5 2.5-4 1.3 1.5 2.5 2.5 2.5 4A2.5 2.5 0 0 1 12 21z", Palette.Yellow)) }
     val Pinch by lazy { icon(2.2f, Line("M4 4l5 5"), Line("M4 9V4h5"), Line("M20 20l-5-5"), Line("M20 15v5h-5")) }
 
     val AddCover by lazy {

@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,6 +38,7 @@ import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.ComicButton
 import com.andreaszel.booklcalendar.ui.components.ComicIcon
 import com.andreaszel.booklcalendar.ui.components.ComicIconButton
+import com.andreaszel.booklcalendar.ui.components.StreakPill
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
 import com.andreaszel.booklcalendar.ui.theme.Dimens
 import com.andreaszel.booklcalendar.ui.theme.Palette
@@ -47,7 +49,7 @@ import java.time.LocalDate
 
 @Composable
 fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Unit, onCalendar: () -> Unit) {
-    val vm = appViewModel { ShelfViewModel(it.books) }
+    val vm = appViewModel { ShelfViewModel(it.books, it.logs) }
     val state by vm.state.collectAsStateWithLifecycle()
     val today = remember { LocalDate.now() }
     val filtering = state.query.isNotBlank()
@@ -65,7 +67,12 @@ fun ShelfScreen(onAdd: () -> Unit, onOpen: (Long) -> Unit, onSettings: () -> Uni
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("My Bookshelf", style = TextStyles.Heading.copy(fontSize = 26.sp, lineHeight = 29.sp), modifier = Modifier.semantics { heading() })
-                    Text(if (filtering) "${state.matches.size} of ${countLabel(state.books.size)}" else if (state.books.size == 1) "1 book logged" else "${state.books.size} books logged", style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (filtering) "${state.matches.size} of ${countLabel(state.books.size)}" else if (state.books.size == 1) "1 book logged" else "${state.books.size} books logged", maxLines = 1, overflow = TextOverflow.Ellipsis, style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted), modifier = Modifier.weight(1f, fill = false))
+                        if (state.streak.current > 0) {
+                            StreakPill(streak = state.streak)
+                        }
+                    }
                 }
                 if (!state.searching && state.books.isNotEmpty()) {
                     ComicIconButton(icon = ComicIcons.Search, label = "Search shelf", fill = Palette.Sky, onClick = vm::openSearch)

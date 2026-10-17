@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +41,7 @@ import com.andreaszel.booklcalendar.ui.DateLabels
 import com.andreaszel.booklcalendar.ui.appViewModel
 import com.andreaszel.booklcalendar.ui.components.ComicIcon
 import com.andreaszel.booklcalendar.ui.components.ComicIconButton
+import com.andreaszel.booklcalendar.ui.components.StreakPill
 import com.andreaszel.booklcalendar.ui.icons.ComicIcons
 import com.andreaszel.booklcalendar.ui.log.LogReadSheet
 import com.andreaszel.booklcalendar.ui.theme.Dimens
@@ -63,7 +65,12 @@ fun CalendarScreen(onBack: () -> Unit, onOpen: (Long) -> Unit) {
             ComicIconButton(icon = ComicIcons.Back, label = "Back to shelf", onClick = onBack)
             Column(modifier = Modifier.weight(1f)) {
                 Text("Reading calendar", style = TextStyles.Heading.copy(fontSize = 26.sp, lineHeight = 29.sp), modifier = Modifier.semantics { heading() })
-                Text(if (state.pages.isEmpty()) "Nothing logged in ${DateLabels.monthName(state.month)}" else "${pagesLabel(total)} on ${daysLabel(state.pages.size)}", style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (state.pages.isEmpty()) "Nothing logged in ${DateLabels.monthName(state.month)}" else "${pagesLabel(total)} on ${daysLabel(state.pages.size)}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = TextStyles.Strong.copy(fontSize = 13.sp, color = Palette.Muted), modifier = Modifier.weight(1f, fill = false))
+                    if (state.streak.current > 0) {
+                        StreakPill(streak = state.streak)
+                    }
+                }
             }
         }
 
