@@ -2,13 +2,19 @@ package com.andreaszel.booklcalendar.ui
 
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 
 object DateLabels {
     private val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-    private val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    private val monthNames = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+    val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     fun month(date: LocalDate) = months[date.monthValue - 1]
+
+    fun monthName(month: YearMonth) = monthNames[month.monthValue - 1]
+
+    fun monthYear(month: YearMonth) = "${monthName(month)} ${month.year}"
 
     fun weekday(date: LocalDate) = weekdays[date.dayOfWeek.value - 1]
 
