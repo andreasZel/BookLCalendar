@@ -12,6 +12,7 @@ import com.andreaszel.booklcalendar.ui.theme.Palette
 object ComicIcons {
     val Book by lazy { icon(2.4f, Line("M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"), Line("M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5")) }
     val Plus by lazy { icon(3f, Line("M12 5v14"), Line("M5 12h14")) }
+    val Minus by lazy { icon(3f, Line("M5 12h14")) }
     val Close by lazy { icon(3f, Line("M6 6l12 12"), Line("M18 6L6 18")) }
     val Back by lazy { icon(3f, Line("M15 5l-7 7 7 7")) }
     val Next by lazy { icon(3f, Line("M9 5l7 7-7 7")) }

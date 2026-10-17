@@ -12,6 +12,8 @@ import com.andreaszel.booklcalendar.lookup.BookMatch
 import com.andreaszel.booklcalendar.lookup.CoverReader
 import com.andreaszel.booklcalendar.lookup.coverQuery
 import com.andreaszel.booklcalendar.lookup.normalizeIsbn
+import com.andreaszel.booklcalendar.ui.log.cleanPages
+import com.andreaszel.booklcalendar.ui.log.parseTotalPages
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +32,7 @@ class AddBookViewModel(private val bookId: Long, private val repository: BookRep
         if (bookId != 0L) viewModelScope.launch {
             val book = repository.get(bookId)
             original = book
-            _state.update { s -> if (book == null) s.copy(loaded = true) else s.copy(loaded = true, coverPath = book.coverPath, coverSource = book.coverSource, title = book.title, author = book.author, description = book.description, isbn = book.isbn, date = book.readDate) }
+            _state.update { s -> if (book == null) s.copy(loaded = true) else s.copy(loaded = true, coverPath = book.coverPath, coverSource = book.coverSource, title = book.title, author = book.author, description = book.description, isbn = book.isbn, date = book.readDate, totalPages = book.totalPages?.toString() ?: "") }
         }
     }
 
@@ -55,6 +57,8 @@ class AddBookViewModel(private val bookId: Long, private val repository: BookRep
     fun onAuthor(value: String) = _state.update { it.copy(author = value) }
 
     fun onDescription(value: String) = _state.update { it.copy(description = value) }
+
+    fun onTotalPages(value: String) = _state.update { it.copy(totalPages = cleanPages(value)) }
 
     fun onDate(value: LocalDate) = _state.update { it.copy(date = value) }
 
@@ -104,7 +108,7 @@ class AddBookViewModel(private val bookId: Long, private val repository: BookRep
         _state.update { it.copy(busy = true) }
         viewModelScope.launch {
             val base = original
-            val book = base?.copy(title = s.title.trim(), author = s.author.trim(), description = s.description.trim(), isbn = s.isbn, readDate = s.date, coverPath = s.coverPath, coverSource = s.coverSource) ?: Book(title = s.title.trim(), author = s.author.trim(), description = s.description.trim(), isbn = s.isbn, readDate = s.date, coverPath = s.coverPath, coverSource = s.coverSource)
+            val book = base?.copy(title = s.title.trim(), author = s.author.trim(), description = s.description.trim(), isbn = s.isbn, readDate = s.date, coverPath = s.coverPath, coverSource = s.coverSource, totalPages = parseTotalPages(s.totalPages)) ?: Book(title = s.title.trim(), author = s.author.trim(), description = s.description.trim(), isbn = s.isbn, readDate = s.date, coverPath = s.coverPath, coverSource = s.coverSource, totalPages = parseTotalPages(s.totalPages))
             repository.save(book)
             imported.remove(s.coverPath)
             imported.toList().forEach { covers.delete(it) }
@@ -181,6 +185,6 @@ class AddBookViewModel(private val bookId: Long, private val repository: BookRep
     }
 }
 
-data class AddBookUiState(val loaded: Boolean = false, val editing: Boolean = false, val coverPath: String? = null, val coverSource: CoverSource? = null, val title: String = "", val author: String = "", val description: String = "", val isbn: String? = null, val date: LocalDate = LocalDate.now(), val attempted: Boolean = false, val undo: Draft? = null, val matches: List<BookMatch> = emptyList(), val picked: Int = -1, val notice: String? = null, val busy: Boolean = false, val saved: Boolean = false)
+data class AddBookUiState(val loaded: Boolean = false, val editing: Boolean = false, val coverPath: String? = null, val coverSource: CoverSource? = null, val title: String = "", val author: String = "", val description: String = "", val isbn: String? = null, val date: LocalDate = LocalDate.now(), val totalPages: String = "", val attempted: Boolean = false, val undo: Draft? = null, val matches: List<BookMatch> = emptyList(), val picked: Int = -1, val notice: String? = null, val busy: Boolean = false, val saved: Boolean = false)
 
 data class Draft(val title: String, val author: String, val description: String, val isbn: String?, val coverPath: String?, val coverSource: CoverSource?)

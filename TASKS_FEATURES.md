@@ -55,12 +55,14 @@ Branch `feat/17-calendar` (from `master`, independent of #15)
 - [x] Unit tests for month cells, heat levels and labels
 - [ ] Visual check on a device or emulator
 
-### #18 Log a read — todo
+### #18 Log a read — done
 Branch `feat/18-log-read`
-- [ ] Bottom sheet: pick a shelf book (searchable), pages stepper + number field, note field
-- [ ] Opens prefilled when that book already has a log on that day, with a delete option
-- [ ] "Log reading" button on book details, prefilled with the book and today
-- [ ] Total pages field in the add/edit form, progress bar on details when set
+- [x] Bottom sheet (`ui/log/LogReadSheet.kt`): pick a shelf book (searchable), pages stepper + number field (0–9999), note field with 280 counter
+- [x] Opens prefilled when that book already has a log on that day, with a delete option (tap twice to confirm)
+- [x] "Log reading" button on book details, prefilled with the book and today. Also in the calendar day sheet for that day, which reopens after saving
+- [x] Total pages field in the add/edit form, reading card with progress bar and summary on details
+- [x] Unit tests for the pages/note helpers and the reading summary
+- [ ] Visual check on a device or emulator
 
 ### #19 Voice notes — todo
 Branch `feat/19-voice-notes`
